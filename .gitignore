@@ -87,6 +87,9 @@ Pipfile.lock
 # PEP 582
 __pypackages__/
 
+# uv
+uv.lock
+
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
