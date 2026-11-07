@@ -19,6 +19,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import errno
 import glob
 import os
 from dataclasses import dataclass, field
@@ -186,6 +187,8 @@ def estimate_target_contents(target: Path) -> int:
             return 0
     try:
         return sum(estimate_size(item) for item in target.iterdir())
+    except PermissionError:
+        return 0
     except OSError:
         return 0
 
@@ -278,6 +281,10 @@ def cleanup_target_contents(target: Path, execute: bool, stats: CleanupStats) ->
 
     try:
         children = list(target.iterdir())
+    except PermissionError:
+        # macOS sandbox blocks access to many system container Caches dirs
+        print(f"[INFO] Permission denied (sandbox), skipping: {target}")
+        return
     except OSError as exc:
         stats.errors += 1
         print(f"[ERROR] Could not list {target}: {exc}")
